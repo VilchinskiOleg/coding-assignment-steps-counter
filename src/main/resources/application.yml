@@ -1,0 +1,13 @@
+server:
+  port: 8100
+  servlet:
+    session:
+      timeout: 60m
+
+spring:
+  application:
+    name: coding-assignment-steps-counter
+
+authentication:
+    username: admin
+    userpwd: admin
