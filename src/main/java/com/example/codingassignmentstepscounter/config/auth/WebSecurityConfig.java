@@ -1,4 +1,4 @@
-package com.example.codingassignmentstepscounter.config;
+package com.example.codingassignmentstepscounter.config.auth;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +23,15 @@ import org.springframework.security.web.context.SecurityContextRepository;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
+  private static final String[] WHITE_LIST = {
+      // -- Swagger UI:
+      "/api-docs/**",
+      "/swagger-ui/**",
+      "/swagger-ui.html",
+      // -- API:
+      "/api/login",
+  };
+
   @Value("${authentication.username}")
   private String username;
   @Value("${authentication.userpwd}")
@@ -40,7 +49,7 @@ public class WebSecurityConfig {
 
         .authorizeHttpRequests(authorize ->
             authorize
-                .requestMatchers("/api/login").permitAll()
+                .requestMatchers(WHITE_LIST).permitAll()
                 .anyRequest().authenticated())
 
         .httpBasic(Customizer.withDefaults())

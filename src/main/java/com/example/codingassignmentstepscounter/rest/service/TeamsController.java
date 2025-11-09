@@ -3,6 +3,8 @@ package com.example.codingassignmentstepscounter.rest.service;
 import com.example.codingassignmentstepscounter.domain.service.StepsCounterService;
 import com.example.codingassignmentstepscounter.mapper.TeamMapper;
 import com.example.codingassignmentstepscounter.rest.model.Team;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,28 +18,33 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@Tag(name = "Team Management", description = "APIs for managing Teams")
 public class TeamsController {
 
   private final StepsCounterService stepsCounterService;
   private final TeamMapper teamMapper;
 
+  @Operation(summary = "Create Team", description = "Creates new team")
   @PostMapping("/teams")
   public List<Team> createTeam(@RequestParam String name) {
     var updatedTeams = stepsCounterService.addTeam(name);
     return teamMapper.toDtoList(updatedTeams);
   }
 
+  @Operation(summary = "Get Total Steps", description = "Returns total steps for team")
   @GetMapping("/teams/{teamId}/total")
   public int getTeamTotalSteps(@PathVariable String teamId) {
     return stepsCounterService.getTeamTotalSteps(teamId);
   }
 
+  @Operation(summary = "Get Teams", description = "Lists data for all teams")
   @GetMapping("/teams")
   public List<Team> getTeams() {
     var teams = stepsCounterService.getAllTeams();
     return teamMapper.toDtoList(teams);
   }
 
+  @Operation(summary = "Delete Team", description = "Removes chosen team")
   @DeleteMapping("/teams/{teamId}")
   public List<Team> deleteTeam(@PathVariable String teamId) {
     var updatedTeams = stepsCounterService.deleteTeam(teamId);

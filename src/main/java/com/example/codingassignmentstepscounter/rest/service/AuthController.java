@@ -1,6 +1,8 @@
 package com.example.codingassignmentstepscounter.rest.service;
 
 import com.example.codingassignmentstepscounter.rest.request.LoginReq;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,11 +24,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@Tag(name = "Auth Management", description = "APIs for managing User's permits")
 public class AuthController {
 
   private final AuthenticationManager authManager;
   private final SecurityContextRepository securityContextRepository;
 
+  @Operation(summary = "LogIn User", description = "Performs log-in for user")
   @PostMapping("/login")
   public ResponseEntity<String> createTeam(@RequestBody LoginReq login,
       HttpServletRequest request,
@@ -44,6 +48,7 @@ public class AuthController {
     return ResponseEntity.ok().build();
   }
 
+  @Operation(summary = "LogOut User", description = "Performs log-out for user")
   @PostMapping("/logout")
   public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
     SecurityContextHolder.clearContext();
