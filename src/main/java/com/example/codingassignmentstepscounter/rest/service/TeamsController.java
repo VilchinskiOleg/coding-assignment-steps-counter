@@ -1,6 +1,6 @@
 package com.example.codingassignmentstepscounter.rest.service;
 
-import com.example.codingassignmentstepscounter.domain.service.StepsCounterService;
+import com.example.codingassignmentstepscounter.domain.service.TeamService;
 import com.example.codingassignmentstepscounter.mapper.TeamMapper;
 import com.example.codingassignmentstepscounter.rest.model.Team;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,33 +21,32 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Team Management", description = "APIs for managing Teams")
 public class TeamsController {
 
-  private final StepsCounterService stepsCounterService;
+  private final TeamService teamService;
   private final TeamMapper teamMapper;
 
   @Operation(summary = "Create Team", description = "Creates new team")
   @PostMapping("/teams")
   public List<Team> createTeam(@RequestParam String name) {
-    var updatedTeams = stepsCounterService.addTeam(name);
-    return teamMapper.toDtoList(updatedTeams);
+    teamService.addTeam(name);
+    return teamMapper.toDtoList(teamService.getAllTeams());
   }
 
   @Operation(summary = "Get Total Steps", description = "Returns total steps for team")
   @GetMapping("/teams/{teamId}/total")
   public int getTeamTotalSteps(@PathVariable String teamId) {
-    return stepsCounterService.getTeamTotalSteps(teamId);
+    return teamService.getTeamTotalSteps(teamId);
   }
 
   @Operation(summary = "Get Teams", description = "Lists data for all teams")
   @GetMapping("/teams")
   public List<Team> getTeams() {
-    var teams = stepsCounterService.getAllTeams();
-    return teamMapper.toDtoList(teams);
+    return teamMapper.toDtoList(teamService.getAllTeams());
   }
 
   @Operation(summary = "Delete Team", description = "Removes chosen team")
   @DeleteMapping("/teams/{teamId}")
   public List<Team> deleteTeam(@PathVariable String teamId) {
-    var updatedTeams = stepsCounterService.deleteTeam(teamId);
-    return teamMapper.toDtoList(updatedTeams);
+    teamService.deleteTeam(teamId);
+    return teamMapper.toDtoList(teamService.getAllTeams());
   }
 }

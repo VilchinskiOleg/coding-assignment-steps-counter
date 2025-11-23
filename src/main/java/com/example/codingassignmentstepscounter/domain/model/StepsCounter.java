@@ -10,13 +10,13 @@ public class StepsCounter {
   private final String id;
   private String memberFirstName;
   private String memberLastName;
-  private int value = 0;
+  private volatile int value = 0;
 
   public StepsCounter(String id) {
     this.id = id;
   }
 
-  public void incrementValue(int income) {
+  public synchronized void incrementValue(int income) {
     value += income;
   }
 }

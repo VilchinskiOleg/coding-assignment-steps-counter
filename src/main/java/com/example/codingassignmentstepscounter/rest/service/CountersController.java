@@ -1,6 +1,7 @@
 package com.example.codingassignmentstepscounter.rest.service;
 
-import com.example.codingassignmentstepscounter.domain.service.StepsCounterService;
+import com.example.codingassignmentstepscounter.domain.service.CounterService;
+import com.example.codingassignmentstepscounter.domain.service.TeamService;
 import com.example.codingassignmentstepscounter.mapper.CounterMapper;
 import com.example.codingassignmentstepscounter.mapper.TeamMapper;
 import com.example.codingassignmentstepscounter.rest.request.CreateCounterReq;
@@ -25,37 +26,37 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Counter Management", description = "APIs for managing Steps Counters in scope of Team")
 public class CountersController {
 
-  private final StepsCounterService stepsCounterService;
+  private final TeamService teamService;
+  private final CounterService counterService;
+
   private final TeamMapper teamMapper;
   private final CounterMapper counterMapper;
 
   @Operation(summary = "Create Counter", description = "Creates new counter for provided team")
   @PostMapping("/teams/{teamId}/counters")
   public Team addCounter(@PathVariable String teamId, @RequestBody CreateCounterReq req) {
-    var updatedTeam = stepsCounterService.addCounter(teamId, req.getMemberFirstName(),
-        req.getMemberLastName());
-    return teamMapper.toDto(updatedTeam);
+    counterService.addCounter(teamId, req.getMemberFirstName(), req.getMemberLastName());
+    return teamMapper.toDto(teamService.getTeamRequired(teamId));
   }
 
   @Operation(summary = "Update Counter", description = "Increments chosen steps counter with provided value")
   @PostMapping("/teams/{teamId}/counters/{counterId}/increment")
   public StepsCounter incrementCounter(@PathVariable String teamId, @PathVariable String counterId,
       @RequestParam Integer steps) {
-    var updatedCounter = stepsCounterService.incrementCounter(teamId, counterId, steps);
+    var updatedCounter = counterService.incrementCounter(teamId, counterId, steps);
     return counterMapper.toDto(updatedCounter);
   }
 
   @Operation(summary = "Get Counter", description = "Returns all counters for provided team")
   @GetMapping("/teams/{teamId}/counters")
   public List<StepsCounter> getCounters(@PathVariable String teamId) {
-    var counters = stepsCounterService.getCounters(teamId);
-    return counterMapper.toDtoList(counters);
+    return counterMapper.toDtoList(counterService.getCounters(teamId));
   }
 
   @Operation(summary = "Delete Counter", description = "Removes chosen steps counter")
   @DeleteMapping("/teams/{teamId}/counters/{counterId}")
   public Team deleteCounter(@PathVariable String teamId, @PathVariable String counterId) {
-    var updatedTeam = stepsCounterService.deleteCounter(teamId, counterId);
-    return teamMapper.toDto(updatedTeam);
+    counterService.deleteCounter(teamId, counterId);
+    return teamMapper.toDto(teamService.getTeamRequired(teamId));
   }
 }
