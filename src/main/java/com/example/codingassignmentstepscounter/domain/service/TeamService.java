@@ -5,13 +5,13 @@ import java.util.List;
 
 public interface TeamService {
 
-  void addTeam(String name);
+  Team addTeam(String name);
 
   Team getTeamRequired(String teamId);
 
   List<Team> getAllTeams();
 
-  int getTeamTotalSteps(String teamId);
+  Integer getTeamTotalSteps(String teamId);
 
   void deleteTeam(String teamId);
 }

@@ -7,22 +7,25 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@Qualifier("teamService")
 @RequiredArgsConstructor
 public class TeamServiceImpl implements TeamService {
 
-  private static final String TEAM_IS_NOT_PRESENT_TMP = "Team with ID = %s is not present";
+  public static final String TEAM_IS_NOT_PRESENT_TMP = "Team with ID = %s is not present";
 
   private final TeamsDao teamsDao;
 
   @Override
-  public void addTeam(String name) {
+  public Team addTeam(String name) {
     Team newTeam = createTeam(name);
     teamsDao.createTeam(newTeam);
     log.info("New team with ID = {} created", newTeam.getId());
+    return newTeam;
   }
 
   @Override
@@ -38,7 +41,7 @@ public class TeamServiceImpl implements TeamService {
   }
 
   @Override
-  public int getTeamTotalSteps(String teamId) {
+  public Integer getTeamTotalSteps(String teamId) {
     return getTeamRequired(teamId).getTotalSteps();
   }
 

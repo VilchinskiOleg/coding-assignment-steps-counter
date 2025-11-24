@@ -1,5 +1,7 @@
 package com.example.codingassignmentstepscounter.domain.service;
 
+import static com.example.codingassignmentstepscounter.domain.service.TeamServiceImpl.TEAM_IS_NOT_PRESENT_TMP;
+
 import com.example.codingassignmentstepscounter.data.CountersDao;
 import com.example.codingassignmentstepscounter.domain.model.StepsCounter;
 import java.util.List;
@@ -8,14 +10,15 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@Qualifier("counterService")
 @RequiredArgsConstructor
 public class CounterServiceImpl implements CounterService {
 
-  private static final String TEAM_IS_NOT_PRESENT_TMP = "Team with ID = %s is not present";
   private static final String COUNTER_IS_NOT_PRESENT_TMP
       = "Counter for Team = %s and with ID = %s is not present";
 

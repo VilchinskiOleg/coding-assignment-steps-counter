@@ -6,8 +6,6 @@ import com.example.codingassignmentstepscounter.data.TeamsDao;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +14,6 @@ import org.springframework.stereotype.Component;
 public class CountersInMemoryDaoImpl implements CountersDao {
 
   private final TeamsDao teamsDao;
-  private final ConcurrentHashMap<String, ReentrantReadWriteLock> locksMap = new ConcurrentHashMap<>();
 
   @Override
   public boolean createCounter(String teamId, StepsCounter newCounter) {
