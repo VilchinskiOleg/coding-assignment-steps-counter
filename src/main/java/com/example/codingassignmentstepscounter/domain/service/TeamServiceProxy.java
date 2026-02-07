@@ -27,6 +27,7 @@ public class TeamServiceProxy implements TeamService {
   @Override
   public Team addTeam(String name) {
     Team newTeam = teamService.addTeam(name);
+    // Здесь достаточно простого put, так как команда только что создана и конфликта быть не может
     lockPerTeamMap.put(newTeam.getId(), new ReentrantReadWriteLock());
     return newTeam;
   }
@@ -36,7 +37,7 @@ public class TeamServiceProxy implements TeamService {
     Optional<ReadLock> lock =
         Optional.ofNullable(lockPerTeamMap.get(teamId)).map(ReentrantReadWriteLock::readLock);
 
-    return LockUtils.executeWithLock(lock, () -> teamService.getTeamRequired(teamId));
+    return LockUtils.executeWithReadLock(lock, () -> teamService.getTeamRequired(teamId));
   }
 
   @Override
@@ -49,7 +50,7 @@ public class TeamServiceProxy implements TeamService {
     Optional<ReadLock> lock =
         Optional.ofNullable(lockPerTeamMap.get(teamId)).map(ReentrantReadWriteLock::readLock);
 
-    return LockUtils.executeWithLock(lock, () -> teamService.getTeamTotalSteps(teamId));
+    return LockUtils.executeWithReadLock(lock, () -> teamService.getTeamTotalSteps(teamId));
   }
 
   @Override
@@ -57,7 +58,10 @@ public class TeamServiceProxy implements TeamService {
     Optional<WriteLock> lock =
         Optional.ofNullable(lockPerTeamMap.get(teamId)).map(ReentrantReadWriteLock::writeLock);
 
-    LockUtils.executeWithLock(lock, () -> teamService.deleteTeam(teamId));
-    lockPerTeamMap.remove(teamId);
+    // Удаляем lock атомарно внутри критической секции, чтобы избежать race condition
+    LockUtils.executeWithWriteLock(lock, () -> {
+      teamService.deleteTeam(teamId);
+      lockPerTeamMap.remove(teamId);
+    });
   }
 }

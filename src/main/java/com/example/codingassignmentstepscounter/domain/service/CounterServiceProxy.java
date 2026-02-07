@@ -27,16 +27,17 @@ public class CounterServiceProxy implements CounterService {
     Optional<ReentrantReadWriteLock.WriteLock> lock =
         Optional.ofNullable(lockPerTeamMap.get(teamId)).map(ReentrantReadWriteLock::writeLock);
 
-    LockUtils.executeWithLock(lock, () -> counterService.addCounter(teamId, firstName, lastName));
+    LockUtils.executeWithWriteLock(lock, () -> counterService.addCounter(teamId, firstName, lastName));
   }
 
   @Override
   public StepsCounter incrementCounter(String teamId, String counterId, Integer steps) {
-    Optional<ReentrantReadWriteLock.ReadLock> lock =
-        Optional.ofNullable(lockPerTeamMap.get(teamId)).map(ReentrantReadWriteLock::readLock);
+    // Используем WriteLock, так как incrementCounter изменяет состояние (даже если incrementValue синхронизирован,
+    // нам нужно защитить операцию получения counter из коллекции и его модификацию как единое целое)
+    Optional<ReentrantReadWriteLock.WriteLock> lock =
+        Optional.ofNullable(lockPerTeamMap.get(teamId)).map(ReentrantReadWriteLock::writeLock);
 
-    // Use ReadLock here because StepsCounter::incrementValue() already synchronized
-    return LockUtils.executeWithLock(lock,
+    return LockUtils.executeWithWriteLock(lock,
         () -> counterService.incrementCounter(teamId, counterId, steps));
   }
 
@@ -45,7 +46,7 @@ public class CounterServiceProxy implements CounterService {
     Optional<ReentrantReadWriteLock.ReadLock> lock =
         Optional.ofNullable(lockPerTeamMap.get(teamId)).map(ReentrantReadWriteLock::readLock);
 
-    return LockUtils.executeWithLock(lock, () -> counterService.getCounters(teamId));
+    return LockUtils.executeWithReadLock(lock, () -> counterService.getCounters(teamId));
   }
 
   @Override
@@ -53,6 +54,6 @@ public class CounterServiceProxy implements CounterService {
     Optional<ReentrantReadWriteLock.WriteLock> lock =
         Optional.ofNullable(lockPerTeamMap.get(teamId)).map(ReentrantReadWriteLock::writeLock);
 
-    LockUtils.executeWithLock(lock, () -> counterService.deleteCounter(teamId, counterId));
+    LockUtils.executeWithWriteLock(lock, () -> counterService.deleteCounter(teamId, counterId));
   }
 }
